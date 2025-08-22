@@ -91,7 +91,7 @@ fun RecentChatItem(chat: RecentChat, onItemClick: (RecentChat) -> Unit) {
             )
         }
 
-        if (chat.isOnline) {
+        if (chat.online) {
             Box(
                 modifier = Modifier
                     .size(14.dp)

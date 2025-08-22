@@ -4,7 +4,7 @@ data class RecentChat(
     val id: String,
     val name: String,
     val timeAgo: String,
-    val isOnline: Boolean = false,
+    val online: Boolean = false,
     val avatarText: String,
     val lastMessage: String? = null,
     val unreadCount: Int = 0

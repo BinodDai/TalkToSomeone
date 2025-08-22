@@ -1,10 +1,13 @@
 package com.binod.talktosomeone.presentation.ui.screens.home
 
+import android.text.format.DateUtils
 import androidx.lifecycle.viewModelScope
 import com.binod.talktosomeone.data.remote.api.FirestoreService
 import com.binod.talktosomeone.domain.aggregator.HomeUseCases
+import com.binod.talktosomeone.domain.aggregator.ProfileUseCases
 import com.binod.talktosomeone.domain.model.ChatSummary
 import com.binod.talktosomeone.domain.model.Profile
+import com.binod.talktosomeone.domain.model.RecentChat
 import com.binod.talktosomeone.presentation.base.BaseViewModel
 import com.binod.talktosomeone.presentation.navigation.Screen
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,6 +20,7 @@ import javax.inject.Inject
 class HomeViewModel
 @Inject constructor(
     private val homeUseCases: HomeUseCases,
+    private val profileUseCases: ProfileUseCases,
     private val firestoreService: FirestoreService,
 ) : BaseViewModel() {
 
@@ -31,15 +35,42 @@ class HomeViewModel
     private val _todayChats = MutableStateFlow<List<ChatSummary>>(emptyList())
     val todayChats: StateFlow<List<ChatSummary>> = _todayChats
 
+    private val _recentChats = MutableStateFlow<List<RecentChat>>(emptyList())
+    val recentChats: StateFlow<List<RecentChat>> = _recentChats
 
     fun loadStats() {
         viewModelScope.launch {
             try {
                 _onlineCount.value = homeUseCases.getOnlinePeopleCount()
-                _todayChats.value = homeUseCases.getTodayChats()
             } catch (e: Exception) {
                 showErrorSnackbar("Failed to load stats")
             }
+        }
+    }
+
+    fun loadRecentChats() {
+        viewModelScope.launch {
+            val chats = homeUseCases.getTodayChats()
+            val myId = currentUserId ?: return@launch
+
+            val recentChats = chats.mapNotNull { summary ->
+                val otherUserId = if (summary.userA == myId) summary.userB else summary.userA
+                val profile = profileUseCases.getProfile(otherUserId)
+
+                profile?.let {
+                    RecentChat(
+                        id = summary.chatId,
+                        name = it.codeName,
+                        timeAgo = DateUtils.getRelativeTimeSpanString(summary.lastTimestamp).toString(),
+                        online = it.online,
+                        avatarText = it.codeName.take(1).uppercase(),
+                        lastMessage = summary.lastMessage
+                    )
+                }
+            }
+
+            _todayChats.value = chats
+            _recentChats.value = recentChats
         }
     }
 

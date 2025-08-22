@@ -61,10 +61,12 @@ fun HomeScreen(
 
     val onlineCount by viewModel.onlineCount.collectAsState()
     val todayChats by viewModel.todayChats.collectAsState()
+    val recentChats by viewModel.recentChats.collectAsState()
     val currentUserId = viewModel.currentUserId ?: ""
 
     LaunchedEffect(Unit) {
         viewModel.loadStats()
+        viewModel.loadRecentChats()
     }
 
 
@@ -160,18 +162,9 @@ fun HomeScreen(
                     })
             }
             item {
+
                 RecentConversationsSection(
-                    recentChats = todayChats.map {
-                        RecentChat(
-                            id = it.chatId,
-                            name = if (it.userA == currentUserId) it.userB else it.userA,
-                            timeAgo = DateUtils.getRelativeTimeSpanString(it.lastTimestamp)
-                                .toString(),
-                            isOnline = true,
-                            avatarText = it.chatId.take(1).uppercase(),
-                            lastMessage = it.lastMessage
-                        )
-                    },
+                    recentChats = recentChats,
                     onItemClick = { chat ->
                         navController.navigate(Screen.Chat.route + "/${chat.id}")
                     }

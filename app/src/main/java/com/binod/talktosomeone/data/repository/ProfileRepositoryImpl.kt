@@ -11,21 +11,21 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 class ProfileRepositoryImpl @Inject constructor(
-    private val firestoreService: FirestoreService,
+    private val service: FirestoreService,
 ) : ProfileRepository {
     private val _profileFlow = MutableStateFlow<Profile?>(null)
     override val profileFlow: Flow<Profile?> = _profileFlow
 
     override suspend fun setOnline(isOnline: Boolean) {
-        firestoreService.setOnline(isOnline)
+        service.setOnlineFlag(isOnline)
     }
 
     override suspend fun createProfile(profile: Profile) {
-        firestoreService.createOrUpdateProfile(profile)
+        service.saveProfile(profile)
     }
 
     override suspend fun refreshProfile(userId: String): Profile? {
-        val profile = firestoreService.getProfile(userId)
+        val profile = service.fetchProfile(userId)
         _profileFlow.value = profile
         return profile
     }
@@ -36,18 +36,17 @@ class ProfileRepositoryImpl @Inject constructor(
 
     override suspend fun signInAnonymously(): String {
         return suspendCoroutine { cont ->
-            firestoreService.signInAnonymously()
+            service.signInAnonymously()
                 .addOnSuccessListener { cont.resume(it.user!!.uid) }
                 .addOnFailureListener { cont.resumeWithException(it) }
         }
     }
 
     override suspend fun setTypingTo(userId: String, typingTo: String?) {
-        firestoreService.setTypingTo(userId, typingTo)
+        service.updateTypingTo(userId, typingTo)
     }
 
-    override fun observeProfile(userId: String): Flow<Profile?> {
-        return firestoreService.observeProfile(userId)
-    }
+    override fun observeProfile(userId: String): Flow<Profile?> =
+        service.observeProfile(userId)
 
 }
