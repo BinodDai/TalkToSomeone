@@ -59,7 +59,8 @@ class HomeViewModel
 
                 profile?.let {
                     RecentChat(
-                        id = summary.chatId,
+                        userId = otherUserId,
+                        chatId = summary.chatId,
                         name = it.codeName,
                         timeAgo = DateUtils.getRelativeTimeSpanString(summary.lastTimestamp).toString(),
                         online = it.online,

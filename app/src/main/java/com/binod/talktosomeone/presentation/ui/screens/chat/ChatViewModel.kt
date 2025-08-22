@@ -116,7 +116,7 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    fun send(text: String, myId: String, partnerId: String) {
+    fun send(text: String, myId: String, partnerId: String, replyToMessageId: String?) {
         if (text.isBlank()) return
         clearTyping(myId)
 
@@ -125,7 +125,8 @@ class ChatViewModel @Inject constructor(
                 senderId = myId,
                 receiverId = partnerId,
                 text = text,
-                status = MessageStatus.SENT
+                status = MessageStatus.SENT,
+                replyToMessageId = replyToMessageId
             )
             chatUseCase.sendMessage(msg)
         }

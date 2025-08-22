@@ -1,6 +1,8 @@
 package com.binod.talktosomeone.presentation.ui.components.chat
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,9 +18,17 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.binod.talktosomeone.domain.model.ChatMessage
@@ -26,33 +36,75 @@ import com.binod.talktosomeone.domain.model.Profile
 import com.binod.talktosomeone.presentation.ui.theme.PrimaryLight
 import com.binod.talktosomeone.presentation.ui.theme.Shapes
 import com.binod.talktosomeone.presentation.ui.theme.dimensions
+import com.binod.talktosomeone.utils.copyTextToClipboard
 import com.binod.talktosomeone.utils.formatTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MessageItem(
-    message: ChatMessage, currentUserId: String, partnerProfile: Profile? = null,
+    message: ChatMessage,
+    currentUserId: String,
+    partnerProfile: Profile? = null,
+    repliedMessage: ChatMessage? = null,
     onReactionClick: ((String) -> Unit)? = null,
-    onMessageLongPress: (() -> Unit)? = null
+    onMessageLongPress: (() -> Unit)? = null,
+    onReplySwipe: ((ChatMessage) -> Unit)? = null
 ) {
     val isFromMe = message.senderId == currentUserId
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val density = LocalDensity.current
+    val swipeThresholdPx = with(density) { 56.dp.toPx() }
+    var totalDragX by remember(message.id) { mutableFloatStateOf(0f) }
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = dimensions.paddingMedium)
+            .pointerInput(message.id) {
+                detectHorizontalDragGestures(
+                    onDragStart = { totalDragX = 0f },
+                    onHorizontalDrag = { change, dragAmount ->
+                        totalDragX += dragAmount
+                        change.consume()
+                    },
+                    onDragCancel = { totalDragX = 0f },
+                    onDragEnd = {
+                        when {
+                            // incoming message: swipe right to reply
+                            !isFromMe && totalDragX >= swipeThresholdPx ->
+                                onReplySwipe?.invoke(message)
+
+                            // outgoing message: swipe left to reply
+                            isFromMe && totalDragX <= -swipeThresholdPx ->
+                                onReplySwipe?.invoke(message)
+                        }
+                        totalDragX = 0f
+                    }
+                )
+            }
+
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = if (isFromMe) Arrangement.End else Arrangement.Start
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth(0.8f),
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .combinedClickable(
+                        onClick = {
+
+                        },
+                        onLongClick = {
+                            copyTextToClipboard(context, message.text ?: "")
+                        }
+                    ),
                 horizontalAlignment = if (isFromMe) Alignment.End else Alignment.Start
             ) {
                 Box {
                     Column {
-                        message.replyToMessageId?.let { replyMessage ->
+                        message.replyToMessageId?.let { replyMessageId ->
                             Card(
                                 modifier = Modifier
                                     .padding(bottom = dimensions.paddingExtraSmall),
@@ -73,7 +125,7 @@ fun MessageItem(
                                         color = PrimaryLight
                                     )
                                     Text(
-                                        text = replyMessage.ifBlank { "Audio message" },
+                                        text = repliedMessage?.text?.ifBlank { "Audio message" } ?: "Message not found",
                                         style = MaterialTheme.typography.labelMedium,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )

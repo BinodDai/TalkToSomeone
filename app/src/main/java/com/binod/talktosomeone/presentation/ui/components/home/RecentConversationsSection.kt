@@ -31,7 +31,9 @@ fun RecentConversationsSection(recentChats: List<RecentChat>, onItemClick: (Rece
         Spacer(modifier = Modifier.height(dimensions.marginMedium))
 
         Column(verticalArrangement = Arrangement.spacedBy(dimensions.marginSmall)) {
-            recentChats.forEach { chat ->
+            recentChats.distinctBy {
+                it.userId
+            }.take(3).forEach { chat ->
                 RecentChatItem(chat = chat, onItemClick = {
                     onItemClick(it)
                 })

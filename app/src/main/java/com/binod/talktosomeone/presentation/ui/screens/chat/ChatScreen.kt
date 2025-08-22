@@ -56,6 +56,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.binod.talktosomeone.presentation.ui.components.chat.AnimatedTypingIndicator
 import com.binod.talktosomeone.presentation.ui.components.chat.MessageItem
+import com.binod.talktosomeone.presentation.ui.components.chat.ReplyPreviewBar
 import com.binod.talktosomeone.presentation.ui.components.common.EmojiBottomSheet
 import com.binod.talktosomeone.presentation.ui.theme.Shapes
 import com.binod.talktosomeone.presentation.ui.theme.dimensions
@@ -75,6 +76,7 @@ fun ChatScreen(
     val messages by viewModel.messages.collectAsState()
     val partnerProfile by viewModel.partnerProfile.collectAsState()
     val isPartnerTyping by viewModel.isPartnerTyping.collectAsState()
+    val replyingTo by viewModel.replyingTo.collectAsState()
     val currentEmoji by viewModel.currentEmoji.collectAsState()
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
@@ -262,8 +264,14 @@ fun ChatScreen(
                             if (messageText.isBlank()) {
                                 isRecording = !isRecording
                             } else {
-                                viewModel.send(messageText, currentUserId, chatPartnerId)
+                                viewModel.send(
+                                    messageText,
+                                    currentUserId,
+                                    chatPartnerId,
+                                    replyingTo?.id
+                                )
                                 messageText = ""
+                                viewModel.setReplyingTo(null)
                                 scope.launch {
                                     if (messages.isNotEmpty()) {
                                         listState.animateScrollToItem(messages.size - 1)
@@ -307,10 +315,18 @@ fun ChatScreen(
                 contentPadding = PaddingValues(vertical = dimensions.paddingSmall)
             ) {
                 items(messages) { message ->
+                    val repliedMessage = message.replyToMessageId?.let { replyId ->
+                        messages.find { it.id == replyId }
+                    }
+
                     MessageItem(
                         message = message,
                         currentUserId = currentUserId,
-                        partnerProfile = partnerProfile
+                        partnerProfile = partnerProfile,
+                        repliedMessage = repliedMessage,
+                        onReplySwipe = { msg ->
+                            viewModel.setReplyingTo(msg)
+                        }
                     )
                 }
             }
@@ -318,7 +334,15 @@ fun ChatScreen(
             // Typing indicator
             AnimatedTypingIndicator(isVisible = isPartnerTyping, userName = displayInitialChar)
 
-            // Message Input
+            if (replyingTo != null) {
+                ReplyPreviewBar(
+                    replyingTo = replyingTo!!,
+                    currentUserId = currentUserId,
+                    partnerProfile = partnerProfile,
+                    onCancelReply = { viewModel.setReplyingTo(null) },
+                    modifier = Modifier.padding(horizontal = dimensions.paddingMedium)
+                )
+            }
         }
     }
 

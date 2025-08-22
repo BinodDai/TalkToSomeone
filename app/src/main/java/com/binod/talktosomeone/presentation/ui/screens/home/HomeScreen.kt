@@ -1,7 +1,6 @@
 package com.binod.talktosomeone.presentation.ui.screens.home
 
 import android.annotation.SuppressLint
-import android.text.format.DateUtils
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,7 +30,6 @@ import androidx.navigation.NavController
 import com.binod.talktosomeone.R
 import com.binod.talktosomeone.domain.model.ConversationStarter
 import com.binod.talktosomeone.domain.model.ConversationStarterType
-import com.binod.talktosomeone.domain.model.RecentChat
 import com.binod.talktosomeone.domain.model.StatCard
 import com.binod.talktosomeone.presentation.navigation.Screen
 import com.binod.talktosomeone.presentation.ui.components.common.CustomSnackbar
@@ -81,7 +79,7 @@ fun HomeScreen(
 
     val stats = listOf(
         StatCard("$onlineCount", "People Online", Gray100),
-        StatCard("${todayChats.size}", "Your chats today", Gray100)
+        StatCard("${todayChats.distinctBy { it.lastSenderId }.size}", "Your chats today", Gray100)
     )
 
     val conversationStarters = listOf(
@@ -161,16 +159,17 @@ fun HomeScreen(
 
                     })
             }
-            item {
 
-                RecentConversationsSection(
-                    recentChats = recentChats,
-                    onItemClick = { chat ->
-                        navController.navigate(Screen.Chat.route + "/${chat.id}")
-                    }
-                )
+            if (recentChats.isNotEmpty()) {
+                item {
+                    RecentConversationsSection(
+                        recentChats = recentChats,
+                        onItemClick = { chat ->
+                            navController.navigate(Screen.Chat.withArgs(chat.userId))
+                        }
+                    )
+                }
             }
-
         }
     }
     if (snackbarState.isVisible) {

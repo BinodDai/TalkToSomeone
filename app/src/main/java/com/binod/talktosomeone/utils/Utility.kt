@@ -1,8 +1,12 @@
 package com.binod.talktosomeone.utils
 
+import android.annotation.SuppressLint
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.LocalContext
 import com.binod.talktosomeone.domain.model.ConversationStarterType
 import com.google.firebase.installations.FirebaseInstallations
 import kotlinx.coroutines.tasks.await
@@ -38,3 +42,11 @@ suspend fun getFirebaseInstallationId(): String {
 
 fun chatIdFor(user1: String, user2: String): String =
     if (user1 < user2) "${user1}_$user2" else "${user2}_$user1"
+
+
+@SuppressLint("ServiceCast")
+fun copyTextToClipboard(context: Context, text: String) {
+    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    val clip = ClipData.newPlainText("Copied Message", text)
+    clipboard.setPrimaryClip(clip)
+}

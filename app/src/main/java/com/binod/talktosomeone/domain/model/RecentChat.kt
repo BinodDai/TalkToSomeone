@@ -1,7 +1,8 @@
 package com.binod.talktosomeone.domain.model
 
 data class RecentChat(
-    val id: String,
+    val chatId: String,
+    val userId: String,
     val name: String,
     val timeAgo: String,
     val online: Boolean = false,
