@@ -8,5 +8,6 @@ data class ChatSummary(
     val userB: String = "",
     val lastMessage: String = "",
     val lastTimestamp: Long = 0L,
-    val lastSenderId: String = ""
+    val lastSenderId: String = "",
+    val participants: List<String> = emptyList()
 )

@@ -1,6 +1,7 @@
 package com.binod.talktosomeone.presentation.ui.screens.home
 
 import android.annotation.SuppressLint
+import android.text.format.DateUtils
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,6 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,7 +41,6 @@ import com.binod.talktosomeone.presentation.ui.components.home.ConversationStart
 import com.binod.talktosomeone.presentation.ui.components.home.GreetingSection
 import com.binod.talktosomeone.presentation.ui.components.home.RecentConversationsSection
 import com.binod.talktosomeone.presentation.ui.components.home.StatsSection
-import com.binod.talktosomeone.presentation.ui.screens.shared.SharedViewModel
 import com.binod.talktosomeone.presentation.ui.theme.Gray100
 import com.binod.talktosomeone.presentation.ui.theme.Gray50
 import com.binod.talktosomeone.presentation.ui.theme.dimensions
@@ -58,6 +59,13 @@ fun HomeScreen(
     val snackbarState by viewModel.snackbarState.collectAsState()
     var selectedType by remember { mutableStateOf<ConversationStarterType?>(null) }
 
+    val onlineCount by viewModel.onlineCount.collectAsState()
+    val todayChats by viewModel.todayChats.collectAsState()
+    val currentUserId = viewModel.currentUserId ?: ""
+
+    LaunchedEffect(Unit) {
+        viewModel.loadStats()
+    }
 
 
     HandleUiEvents(
@@ -70,83 +78,9 @@ fun HomeScreen(
     )
 
     val stats = listOf(
-        StatCard("1.2k", "People", Gray100), StatCard("3", "Your chats today", Gray100)
+        StatCard("$onlineCount", "People Online", Gray100),
+        StatCard("${todayChats.size}", "Your chats today", Gray100)
     )
-
-    val recentChats = listOf(
-        RecentChat(
-            id = "1",
-            name = "Mike",
-            timeAgo = "2 hours ago",
-            isOnline = true,
-            avatarText = "M",
-            lastMessage = "Hey there!"
-        ),
-
-        RecentChat(
-            id = "1",
-            name = "Mike",
-            timeAgo = "2 hours ago",
-            isOnline = true,
-            avatarText = "M",
-            lastMessage = "Hey there!"
-        ),
-
-        RecentChat(
-            id = "1",
-            name = "Mike",
-            timeAgo = "2 hours ago",
-            isOnline = true,
-            avatarText = "M",
-            lastMessage = "Hey there!"
-        ),
-
-        RecentChat(
-            id = "1",
-            name = "Mike",
-            timeAgo = "2 hours ago",
-            isOnline = true,
-            avatarText = "M",
-            lastMessage = "Hey there!"
-        ),
-
-        RecentChat(
-            id = "1",
-            name = "Mike",
-            timeAgo = "2 hours ago",
-            isOnline = true,
-            avatarText = "M",
-            lastMessage = "Hey there!"
-        ),
-
-        RecentChat(
-            id = "1",
-            name = "Mike",
-            timeAgo = "2 hours ago",
-            isOnline = true,
-            avatarText = "M",
-            lastMessage = "Hey there!"
-        ),
-
-        RecentChat(
-            id = "1",
-            name = "Mike",
-            timeAgo = "2 hours ago",
-            isOnline = true,
-            avatarText = "M",
-            lastMessage = "Hey there!"
-        ),
-
-        RecentChat(
-            id = "1",
-            name = "Mike",
-            timeAgo = "2 hours ago",
-            isOnline = true,
-            avatarText = "M",
-            lastMessage = "Hey there!"
-        )
-    )
-
 
     val conversationStarters = listOf(
         ConversationStarter(
@@ -226,10 +160,24 @@ fun HomeScreen(
                     })
             }
             item {
-                RecentConversationsSection(recentChats = recentChats, onItemClick = {
-                    navController.navigate(Screen.Chat.route)
-                })
+                RecentConversationsSection(
+                    recentChats = todayChats.map {
+                        RecentChat(
+                            id = it.chatId,
+                            name = if (it.userA == currentUserId) it.userB else it.userA,
+                            timeAgo = DateUtils.getRelativeTimeSpanString(it.lastTimestamp)
+                                .toString(),
+                            isOnline = true,
+                            avatarText = it.chatId.take(1).uppercase(),
+                            lastMessage = it.lastMessage
+                        )
+                    },
+                    onItemClick = { chat ->
+                        navController.navigate(Screen.Chat.route + "/${chat.id}")
+                    }
+                )
             }
+
         }
     }
     if (snackbarState.isVisible) {

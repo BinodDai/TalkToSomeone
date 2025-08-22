@@ -83,7 +83,6 @@ class ProfileFormViewModel @Inject constructor(
             setLoading(true)
             try {
                 userId = profileUseCases.signInAnonymously()
-                secureStorage.set(PrefKeys.USER_ID, userId)
             } catch (e: Exception) {
                 setLoading(false)
             } finally {

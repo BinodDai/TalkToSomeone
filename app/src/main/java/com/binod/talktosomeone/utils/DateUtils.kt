@@ -1,6 +1,7 @@
 package com.binod.talktosomeone.utils
 
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -27,4 +28,13 @@ fun formatLastSeen(date: Date): String {
         diff < 86400_000 -> "${diff / 3600_000} hours ago"
         else -> SimpleDateFormat("MMM dd, HH:mm", Locale.getDefault()).format(date)
     }
+}
+
+fun getStartOfDayTimestamp(): Long {
+    return Calendar.getInstance().apply {
+        set(Calendar.HOUR_OF_DAY, 0)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
+    }.timeInMillis
 }

@@ -5,6 +5,7 @@ import com.binod.talktosomeone.domain.model.ChatMessage
 import com.binod.talktosomeone.domain.model.ChatSummary
 import com.binod.talktosomeone.domain.model.MessageStatus
 import com.binod.talktosomeone.domain.model.Profile
+import com.binod.talktosomeone.utils.getStartOfDayTimestamp
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
@@ -83,7 +84,8 @@ class FirestoreService @Inject constructor(
                 userB = chatId.substringAfter('_'),
                 lastMessage = payload.text ?: (payload.imageUrl?.let { "[image]" } ?: ""),
                 lastTimestamp = payload.timestamp,
-                lastSenderId = payload.senderId
+                lastSenderId = payload.senderId,
+                participants = listOf(message.senderId, message.receiverId)
             )
         )
     }
@@ -166,6 +168,26 @@ class FirestoreService @Inject constructor(
         Log.d("QuickMatch", "Query returned ${snapshot.documents.size} documents")
 
         return snapshot.documents.firstOrNull()?.toObject(Profile::class.java)
+    }
+
+    suspend fun getOnlinePeopleCount(): Int {
+        val snapshot = profilesCollection
+            .whereEqualTo("online", true)
+            .get().await()
+        return snapshot.size()
+    }
+
+    suspend fun getTodayChats(): List<ChatSummary> {
+        val userId = currentUserId() ?: return emptyList()
+
+        val startOfDay = getStartOfDayTimestamp()
+
+        val snapshot = chats
+            .whereArrayContains("participants", userId)
+            .whereGreaterThanOrEqualTo("lastTimestamp", startOfDay)
+            .get().await()
+
+        return snapshot.documents.mapNotNull { it.toObject(ChatSummary::class.java) }
     }
 
 }

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -47,6 +48,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
@@ -83,6 +85,8 @@ fun ChatScreen(
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
 
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     LaunchedEffect(chatPartnerId) {
         coroutineScope {
             launch { viewModel.getPartnerProfileById(chatPartnerId) }
@@ -115,8 +119,7 @@ fun ChatScreen(
 
     Scaffold(
         modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
+            .fillMaxSize(),
         topBar = {
             TopAppBar(
                 title = {
@@ -160,7 +163,11 @@ fun ChatScreen(
                     }
                 },
                 navigationIcon = {
-                    IconButton(onClick = { navController.navigateUp() }) {
+                    IconButton(
+                        onClick = {
+                            keyboardController?.hide()
+                            navController.navigateUp()
+                        }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
@@ -181,44 +188,18 @@ fun ChatScreen(
                     containerColor = MaterialTheme.colorScheme.surface
                 )
             )
-        }
-    ) { innerPadding ->
-
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-        ) {
-            // Messages List
-            LazyColumn(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth(),
-                state = listState,
-                verticalArrangement = Arrangement.spacedBy(dimensions.spaceSmall),
-                contentPadding = PaddingValues(vertical = dimensions.paddingSmall)
-            ) {
-                items(messages) { message ->
-                    MessageItem(
-                        message = message,
-                        currentUserId = currentUserId,
-                        partnerProfile = partnerProfile
-                    )
-                }
-            }
-
-            // Typing indicator
-            AnimatedTypingIndicator(isVisible = isPartnerTyping, userName = displayInitialChar)
-
-            // Message Input
+        },
+        bottomBar = {
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .imePadding(),
                 shape = Shapes.large,
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surface
                 )
-            ) {
+            )
+            {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -306,6 +287,38 @@ fun ChatScreen(
                     }
                 }
             }
+
+        }
+    ) { innerPadding ->
+
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            // Messages List
+            LazyColumn(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                state = listState,
+                verticalArrangement = Arrangement.spacedBy(dimensions.spaceSmall),
+                contentPadding = PaddingValues(vertical = dimensions.paddingSmall)
+            ) {
+                items(messages) { message ->
+                    MessageItem(
+                        message = message,
+                        currentUserId = currentUserId,
+                        partnerProfile = partnerProfile
+                    )
+                }
+            }
+
+            // Typing indicator
+            AnimatedTypingIndicator(isVisible = isPartnerTyping, userName = displayInitialChar)
+
+            // Message Input
         }
     }
 

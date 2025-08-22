@@ -16,6 +16,7 @@
         android:theme="@style/Theme.TalkToSomeone">
         <activity
             android:name=".MainActivity"
+            android:windowSoftInputMode="adjustNothing"
             android:exported="true"
             android:theme="@style/Theme.TalkToSomeone">
             <intent-filter>

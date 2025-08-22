@@ -3,6 +3,7 @@ package com.binod.talktosomeone.data.repository
 import com.binod.talktosomeone.data.remote.api.FirestoreService
 import com.binod.talktosomeone.domain.model.ChatMessage
 import com.binod.talktosomeone.domain.model.Profile
+import com.binod.talktosomeone.domain.model.RecentChat
 import com.binod.talktosomeone.domain.repository.ChatRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -31,5 +32,10 @@ class ChatRepositoryImpl @Inject constructor(
 
     override suspend fun getMessageById(chatId: String, messageId: String): ChatMessage? =
         service.getMessageById(chatId, messageId)
+
+    override fun observeRecentChats(userId: String): Flow<List<RecentChat>> {
+        TODO("Not yet implemented")
+    }
+
 
 }
