@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">TalkToSomeone</string>
+    <string name="advice">Advice</string>
+    <string name="start_a_conversation">Start a conversation</string>
+    <string name="how_are_you_feeling_today_ready_to_connect">How\'s your day? Ready to connect?</string>
+    <string name="connect_instantly">Connect instantly</string>
+    <string name="just_need_to_talk">Just need to talk</string>
+    <string name="get_perspective">Get perspective</string>
+    <string name="choose_interest">Choose interest</string>
+    <string name="recent_conversations">Recent conversations</string>
+    <string name="connect_with_someone_who_can_offer_perspective_and_practical_guidance_on_your_situation">Connect with someone who can offer perspective and practical guidance on your situation</string>
+    <string name="what_area_do_you_need_help_with">What area do you need help with?</string>
+    <string name="design_your_unique_identity">Design your unique identity</string>
+    <string name="create_profile">Create Profile</string>
+    <string name="code_name">Code Name</string>
+    <string name="age">Age</string>
+    <string name="enter_your_age">Enter your age</string>
+    <string name="gender">Gender</string>
+    <string name="select_gender">Select gender</string>
+    <string name="profile_icon">Profile Icon</string>
+    <string name="select_option">Select Option</string>
+    <string name="enter_or_shuffle_name">Enter or shuffle name</string>
+    <string name="loading">Loading...</string>
+    <string name="select_emoji">Select Emoji</string>
+</resources>

@@ -1,0 +1,53 @@
+package com.binod.talktosomeone.data.repository
+
+import com.binod.talktosomeone.data.remote.api.FirestoreService
+import com.binod.talktosomeone.domain.model.Profile
+import com.binod.talktosomeone.domain.repository.ProfileRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import javax.inject.Inject
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
+
+class ProfileRepositoryImpl @Inject constructor(
+    private val firestoreService: FirestoreService,
+) : ProfileRepository {
+    private val _profileFlow = MutableStateFlow<Profile?>(null)
+    override val profileFlow: Flow<Profile?> = _profileFlow
+
+    override suspend fun setOnline(isOnline: Boolean) {
+        firestoreService.setOnline(isOnline)
+    }
+
+    override suspend fun createProfile(profile: Profile) {
+        firestoreService.createOrUpdateProfile(profile)
+    }
+
+    override suspend fun refreshProfile(userId: String): Profile? {
+        val profile = firestoreService.getProfile(userId)
+        _profileFlow.value = profile
+        return profile
+    }
+
+    override suspend fun getProfile(userId: String): Profile? {
+        return _profileFlow.value ?: refreshProfile(userId)
+    }
+
+    override suspend fun signInAnonymously(): String {
+        return suspendCoroutine { cont ->
+            firestoreService.signInAnonymously()
+                .addOnSuccessListener { cont.resume(it.user!!.uid) }
+                .addOnFailureListener { cont.resumeWithException(it) }
+        }
+    }
+
+    override suspend fun setTypingTo(userId: String, typingTo: String?) {
+        firestoreService.setTypingTo(userId, typingTo)
+    }
+
+    override fun observeProfile(userId: String): Flow<Profile?> {
+        return firestoreService.observeProfile(userId)
+    }
+
+}

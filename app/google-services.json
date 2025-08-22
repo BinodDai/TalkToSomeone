@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "128813383412",
+    "firebase_url": "https://talktosomeone-39066-default-rtdb.firebaseio.com",
+    "project_id": "talktosomeone-39066",
+    "storage_bucket": "talktosomeone-39066.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:128813383412:android:92e789093744d4608b28a1",
+        "android_client_info": {
+          "package_name": "com.binod.talktosomeone"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6jQw2M4ddXmOquIqJMGXKyOqquk5SYZg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
