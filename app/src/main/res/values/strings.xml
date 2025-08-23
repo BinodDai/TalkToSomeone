@@ -22,4 +22,9 @@
     <string name="enter_or_shuffle_name">Enter or shuffle name</string>
     <string name="loading">Loading...</string>
     <string name="select_emoji">Select Emoji</string>
+    <string name="search_user">Search User</string>
+    <string name="continue_label">Continue</string>
+    <string name="user_id">User Id</string>
+    <string name="cancel">Cancel</string>
+    <string name="user_found">User found</string>
 </resources>

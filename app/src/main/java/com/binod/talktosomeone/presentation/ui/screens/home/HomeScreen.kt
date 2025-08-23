@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Message
@@ -22,14 +23,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -42,6 +46,7 @@ import com.binod.talktosomeone.presentation.ui.components.common.CustomSnackbar
 import com.binod.talktosomeone.presentation.ui.components.common.FullScreenLoader
 import com.binod.talktosomeone.presentation.ui.components.common.HandleUiEvents
 import com.binod.talktosomeone.presentation.ui.components.common.IconCircleButton
+import com.binod.talktosomeone.presentation.ui.components.common.SearchUserBottomSheet
 import com.binod.talktosomeone.presentation.ui.components.home.ConversationStartersSection
 import com.binod.talktosomeone.presentation.ui.components.home.GreetingSection
 import com.binod.talktosomeone.presentation.ui.components.home.RecentConversationsSection
@@ -50,6 +55,8 @@ import com.binod.talktosomeone.presentation.ui.theme.Gray100
 import com.binod.talktosomeone.presentation.ui.theme.Gray50
 import com.binod.talktosomeone.presentation.ui.theme.dimensions
 import com.binod.talktosomeone.utils.Constants
+import com.binod.talktosomeone.utils.copyTextToClipboard
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -67,7 +74,14 @@ fun HomeScreen(
     val onlineCount by viewModel.onlineCount.collectAsState()
     val todayChats by viewModel.todayChats.collectAsState()
     val recentChats by viewModel.recentChats.collectAsState()
+
     val currentUserId = viewModel.currentUserId ?: ""
+    val nameCode = viewModel.nameCode
+    val context = LocalContext.current
+
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var showSearchSheet by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         viewModel.loadStats()
@@ -132,18 +146,27 @@ fun HomeScreen(
                     vertical = dimensions.paddingSmall
                 ),
                 title = {
-                    Text("John Doe", style = MaterialTheme.typography.titleLarge)
+                    Text(
+                        text = nameCode,
+                        modifier = Modifier.wrapContentWidth(),
+                        style = MaterialTheme.typography.titleLarge
+                    )
                 },
                 navigationIcon = {
                     IconCircleButton(
                         icon = { Icon(Icons.Outlined.ContentCopy, contentDescription = "Copy") },
-                        onClick = { /* copy */ }
+                        onClick = {
+                            copyTextToClipboard(context, currentUserId)
+                        }
                     )
                 },
                 actions = {
                     IconCircleButton(
                         icon = { Icon(Icons.Outlined.Search, contentDescription = "Search") },
-                        onClick = { /* search */ }
+                        onClick = {
+                            showSearchSheet = true
+                            coroutineScope.launch { sheetState.show() }
+                        }
                     )
                     Spacer(Modifier.padding(dimensions.paddingExtraSmall))
                     IconCircleButton(
@@ -153,7 +176,7 @@ fun HomeScreen(
                                 contentDescription = "Message"
                             )
                         },
-                        onClick = { /* message */ }
+                        onClick = { navController.navigate(Screen.Messages.route) }
                     )
                 }
             )
@@ -185,15 +208,15 @@ fun HomeScreen(
                             }
 
                             ConversationStarterType.VENT -> {
-
+                                viewModel.quickMatch()
                             }
 
                             ConversationStarterType.ADVICE -> {
-
+                                viewModel.quickMatch()
                             }
 
                             ConversationStarterType.TOPIC -> {
-
+                                viewModel.quickMatch()
                             }
                         }
 
@@ -218,6 +241,23 @@ fun HomeScreen(
             onDismiss = { viewModel.dismissSnackbar() },
             modifier = Modifier
                 .statusBarsPadding()
+        )
+    }
+
+    if (showSearchSheet) {
+        SearchUserBottomSheet(
+            sheetState = sheetState,
+            currentUserId = currentUserId,
+            onDismiss = {
+                coroutineScope.launch { sheetState.hide() }
+                    .invokeOnCompletion { showSearchSheet = false }
+            },
+            onSearch = { userId ->
+                viewModel.getProfileByUserId(userId.trim())
+            },
+            onContinue = { profile ->
+                navController.navigate(Screen.Chat.withArgs(profile.userId))
+            }
         )
     }
 

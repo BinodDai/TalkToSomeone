@@ -8,6 +8,7 @@ sealed class Screen(val route: String) {
     object Advice : Screen(Constants.ADVICE)
     object ChooseTopic : Screen(Constants.TOPIC)
     object Profile : Screen(Constants.PROFILE)
+    object Messages : Screen(Constants.MESSAGES)
 
 
     object Chat : Screen("chat/{userId}") {

@@ -8,6 +8,7 @@ import com.binod.talktosomeone.domain.model.Profile
 import com.binod.talktosomeone.domain.model.RecentChat
 import com.binod.talktosomeone.domain.repository.ChatRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -66,18 +67,7 @@ class ChatRepositoryImpl @Inject constructor(
     override suspend fun getMessageById(chatId: String, messageId: String): ChatMessage? =
         service.getMessageById(chatId, messageId)
 
-//    override fun observeRecentChats(userId: String): Flow<List<RecentChat>> =
-//        service.observeMyChats(userId)
-//            .map { chats ->
-//                chats.map {
-//                    RecentChat(
-//                        chatId = it.chatId,
-//                        lastMessage = it.lastMessage,
-//                        lastTimestamp = it.lastTimestamp,
-//                        otherUserId = it.participants.first { uid -> uid != userId }
-//                    )
-//                }
-//            }
-
+    override fun observeAllChats(userId: String): Flow<List<ChatSummary>> =
+        service.observeMyChats(userId)
 
 }

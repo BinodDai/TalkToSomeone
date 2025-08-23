@@ -1,6 +1,7 @@
 package com.binod.talktosomeone.domain.repository
 
 import com.binod.talktosomeone.domain.model.ChatMessage
+import com.binod.talktosomeone.domain.model.ChatSummary
 import kotlinx.coroutines.flow.Flow
 
 interface ChatRepository {
@@ -16,5 +17,5 @@ interface ChatRepository {
     ): Result<Unit>
 
     suspend fun getMessageById(chatId: String, messageId: String): ChatMessage?
-//    fun observeRecentChats(userId: String): Flow<List<RecentChat>>
+    fun observeAllChats(userId: String): Flow<List<ChatSummary>>
 }

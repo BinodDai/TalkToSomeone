@@ -2,7 +2,10 @@ package com.binod.talktosomeone.presentation.ui.screens.home
 
 import android.text.format.DateUtils
 import androidx.lifecycle.viewModelScope
+import com.binod.talktosomeone.data.local.preferences.LocalStorage
+import com.binod.talktosomeone.data.local.preferences.PrefKeys
 import com.binod.talktosomeone.data.remote.api.FirestoreService
+import com.binod.talktosomeone.di.SecureStorage
 import com.binod.talktosomeone.domain.aggregator.HomeUseCases
 import com.binod.talktosomeone.domain.aggregator.ProfileUseCases
 import com.binod.talktosomeone.domain.model.ChatSummary
@@ -22,12 +25,17 @@ class HomeViewModel
     private val homeUseCases: HomeUseCases,
     private val profileUseCases: ProfileUseCases,
     private val firestoreService: FirestoreService,
+    @param:SecureStorage private val securedStorage: LocalStorage,
 ) : BaseViewModel() {
 
     val currentUserId: String? get() = firestoreService.currentUserId()
+    val nameCode: String = securedStorage[PrefKeys.CODE_NAME, String::class.java]
 
     private val _matchedProfile = MutableStateFlow<Profile?>(null)
     val matchedProfile: StateFlow<Profile?> = _matchedProfile
+
+    private val _profile = MutableStateFlow<Profile?>(null)
+    val profile: StateFlow<Profile?> = _profile
 
     private val _onlineCount = MutableStateFlow(0)
     val onlineCount: StateFlow<Int> = _onlineCount
@@ -48,6 +56,16 @@ class HomeViewModel
         }
     }
 
+    suspend fun getProfileByUserId(userID: String): Profile? {
+        return try {
+            val profile = profileUseCases.getProfile(userID)
+            _profile.value = profile
+            profile
+        } catch (e: Exception) {
+            null
+        }
+    }
+
     fun loadRecentChats() {
         viewModelScope.launch {
             val chats = homeUseCases.getTodayChats()
@@ -62,7 +80,8 @@ class HomeViewModel
                         userId = otherUserId,
                         chatId = summary.chatId,
                         name = it.codeName,
-                        timeAgo = DateUtils.getRelativeTimeSpanString(summary.lastTimestamp).toString(),
+                        timeAgo = DateUtils.getRelativeTimeSpanString(summary.lastTimestamp)
+                            .toString(),
                         online = it.online,
                         avatarText = it.codeName.take(1).uppercase(),
                         lastMessage = summary.lastMessage

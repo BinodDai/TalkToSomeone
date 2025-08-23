@@ -4,6 +4,7 @@ import com.binod.talktosomeone.domain.usecase.AddReactionUseCase
 import com.binod.talktosomeone.domain.usecase.GetMessageByIdUseCase
 import com.binod.talktosomeone.domain.usecase.MarkDeliveredUseCase
 import com.binod.talktosomeone.domain.usecase.MarkSeenUseCase
+import com.binod.talktosomeone.domain.usecase.ObserveAllChatsUseCase
 import com.binod.talktosomeone.domain.usecase.ObserveMessagesUseCase
 import com.binod.talktosomeone.domain.usecase.SendMessageUseCase
 import javax.inject.Inject
@@ -15,4 +16,5 @@ class ChatUseCases @Inject constructor(
     val markSeen: MarkSeenUseCase,
     val addReaction: AddReactionUseCase,
     val getMessageById: GetMessageByIdUseCase,
+    val observeAllChatsUseCase: ObserveAllChatsUseCase,
 )

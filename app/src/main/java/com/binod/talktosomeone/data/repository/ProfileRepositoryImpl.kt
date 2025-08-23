@@ -31,7 +31,7 @@ class ProfileRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getProfile(userId: String): Profile? {
-        return _profileFlow.value ?: refreshProfile(userId)
+        return  refreshProfile(userId)
     }
 
     override suspend fun signInAnonymously(): String {

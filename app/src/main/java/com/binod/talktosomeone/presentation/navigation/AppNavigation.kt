@@ -12,6 +12,7 @@ import com.binod.talktosomeone.presentation.navigation.Screen
 import com.binod.talktosomeone.presentation.ui.screens.advice.AdviceScreen
 import com.binod.talktosomeone.presentation.ui.screens.chat.ChatScreen
 import com.binod.talktosomeone.presentation.ui.screens.home.HomeScreen
+import com.binod.talktosomeone.presentation.ui.screens.messages.MessagesScreen
 import com.binod.talktosomeone.presentation.ui.screens.profile.ProfileFormScreen
 
 @Composable
@@ -39,6 +40,7 @@ fun AppNavigation() {
     NavHost(navController = navController, startDestination = startDestination) {
         composable(Screen.Profile.route) { ProfileFormScreen(navController) }
         composable(Screen.Home.route) { HomeScreen(navController) }
+        composable(Screen.Messages.route) { MessagesScreen(navController) }
 //        composable(Screen.Vent.route) { VentScreen() }
         composable(Screen.Advice.route) { AdviceScreen(navController = navController) }
         composable(

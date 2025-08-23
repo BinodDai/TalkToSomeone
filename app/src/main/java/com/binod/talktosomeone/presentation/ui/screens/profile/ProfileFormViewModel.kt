@@ -1,5 +1,6 @@
 package com.binod.talktosomeone.presentation.ui.screens.profile
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.binod.talktosomeone.data.local.preferences.LocalStorage
 import com.binod.talktosomeone.data.local.preferences.PrefKeys
@@ -93,13 +94,14 @@ class ProfileFormViewModel @Inject constructor(
 
     fun createProfile() {
         viewModelScope.launch {
+            val nameCode = aiNameCode.value
             setLoading(true)
             try {
                 val deviceId = getFirebaseInstallationId()
                 val profile = Profile(
                     docId = userId,
                     userId = userId,
-                    codeName = aiNameCode.value,
+                    codeName = nameCode,
                     age = age.value.toIntOrNull() ?: 0,
                     gender = gender.value,
                     deviceId = deviceId,
@@ -108,6 +110,7 @@ class ProfileFormViewModel @Inject constructor(
                 )
                 profileUseCases.createProfile(profile)
                 defaultStorage.set(PrefKeys.IS_PROFILE_SETUP_COMPLETED, true)
+                secureStorage.set(PrefKeys.CODE_NAME, nameCode)
                 sendEvent(UiEvent.Navigate(Screen.Home.route))
             } catch (e: Exception) {
                 sendEvent(UiEvent.ShowToast("Profile creation failed"))

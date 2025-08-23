@@ -9,6 +9,7 @@ class Constants {
         const val HOME= "Home"
         const val CHAT = "Chat"
         const val PROFILE = "Profile"
+        const val MESSAGES = "Messages"
     }
 
 }
