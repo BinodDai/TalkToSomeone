@@ -3,18 +3,24 @@ package com.binod.talktosomeone.presentation.ui.screens.home
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Message
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.TrackChanges
+import androidx.compose.material.icons.outlined.ContentCopy
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -35,6 +41,7 @@ import com.binod.talktosomeone.presentation.navigation.Screen
 import com.binod.talktosomeone.presentation.ui.components.common.CustomSnackbar
 import com.binod.talktosomeone.presentation.ui.components.common.FullScreenLoader
 import com.binod.talktosomeone.presentation.ui.components.common.HandleUiEvents
+import com.binod.talktosomeone.presentation.ui.components.common.IconCircleButton
 import com.binod.talktosomeone.presentation.ui.components.home.ConversationStartersSection
 import com.binod.talktosomeone.presentation.ui.components.home.GreetingSection
 import com.binod.talktosomeone.presentation.ui.components.home.RecentConversationsSection
@@ -117,12 +124,44 @@ fun HomeScreen(
 
     )
 
-    Scaffold(topBar = {
-        TopAppBar(
-            modifier = Modifier.padding(vertical = dimensions.paddingMedium),
-            title = { GreetingSection() },
-        )
-    }) { innerPadding ->
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                modifier = Modifier.padding(
+                    horizontal = dimensions.paddingSmall,
+                    vertical = dimensions.paddingSmall
+                ),
+                title = {
+                    Text("John Doe", style = MaterialTheme.typography.titleLarge)
+                },
+                navigationIcon = {
+                    IconCircleButton(
+                        icon = { Icon(Icons.Outlined.ContentCopy, contentDescription = "Copy") },
+                        onClick = { /* copy */ }
+                    )
+                },
+                actions = {
+                    IconCircleButton(
+                        icon = { Icon(Icons.Outlined.Search, contentDescription = "Search") },
+                        onClick = { /* search */ }
+                    )
+                    Spacer(Modifier.padding(dimensions.paddingExtraSmall))
+                    IconCircleButton(
+                        icon = {
+                            Icon(
+                                Icons.AutoMirrored.Outlined.Message,
+                                contentDescription = "Message"
+                            )
+                        },
+                        onClick = { /* message */ }
+                    )
+                }
+            )
+        }
+    )
+
+
+    { innerPadding ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -131,6 +170,7 @@ fun HomeScreen(
                 .padding(horizontal = dimensions.paddingMedium),
             verticalArrangement = Arrangement.spacedBy(dimensions.paddingLarge)
         ) {
+            item { GreetingSection() }
             item { StatsSection(stats = stats) }
             item {
                 ConversationStartersSection(
