@@ -1,6 +1,5 @@
 package com.binod.talktosomeone.presentation.ui.screens.profile
 
-import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.binod.talktosomeone.data.local.preferences.LocalStorage
 import com.binod.talktosomeone.data.local.preferences.PrefKeys
@@ -133,15 +132,40 @@ class ProfileFormViewModel @Inject constructor(
         val animals = listOf(
             "Dragon", "Falcon", "Wolf", "Jackal", "Tiger", "Phoenix",
             "Lion", "Eagle", "Panther", "Hawk", "Raven", "Leopard",
-            "Fox", "Griffin", "Cobra", "Shark", "Bear", "Owl", "Jackal"
+            "Fox", "Griffin", "Cobra", "Shark", "Bear", "Owl", "Jackal",
+            "Cheetah", "Jaguar", "Lynx", "Cougar", "Puma", "Bobcat",
+            "Ocelot", "Serval", "Caracal", "Margay", "Wildcat", "Saber",
         )
         val birds = listOf(
-            "Falcon", "Eagle", "Hawk", "Raven", "Owl", "Parrot",
-            "Phoenix", "Sparrow", "Crow", "Peacock"
+            "Falcon",
+            "Eagle",
+            "Hawk",
+            "Raven",
+            "Owl",
+            "Parrot",
+            "Phoenix",
+            "Sparrow",
+            "Crow",
+            "Peacock",
+            "Kestrel",
+            "Goshawk ",
+            "Peregrine ",
+            "Merlin ",
+            "Harrier ",
+            "Buzzard ",
+            "Osprey",
+            "Condor",
+            "Vulture",
+            "Kite",
+            "Caracara",
+            "Secretary"
         )
         val universeWords = listOf(
             "Lunar", "Solar", "Cosmic", "Nebula", "Stellar", "Orbit",
-            "Galaxy", "Meteor", "Comet", "Astro", "Nova", "Eclipse"
+            "Galaxy", "Meteor", "Comet", "Astro", "Nova", "Eclipse",
+            "Supernova", "Pulsar", "Quasar", "Binary", "Dwarf", "Giant",
+            "Neutron", "Blackhole", "Wormhole", "Singularity", "Fusion", "Flare",
+            "Corona", "Photosphere", "Chromosphere", "Sunspot", "Prominence", "Helix"
         )
         val waterAnimals = listOf(
             "Shark", "Dolphin", "Whale", "Octopus", "Squid", "Seal",
