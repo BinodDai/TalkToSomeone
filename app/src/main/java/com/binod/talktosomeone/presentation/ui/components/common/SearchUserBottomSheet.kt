@@ -137,7 +137,7 @@ fun SearchUserBottomSheet(
 
             AnimatedVisibility(visible = searchAttempted && profile != null && currentUserId != profile?.userId) {
                 InfoCard(
-                    text = "User found:\n ${profile?.codeName ?: ""}",
+                    text = "User found:\n${profile?.codeName ?: ""}",
                     backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
                     textColor = MaterialTheme.colorScheme.onSurfaceVariant
                 )

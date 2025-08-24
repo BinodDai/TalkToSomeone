@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Message
 import androidx.compose.material.icons.filled.Bolt
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.TrackChanges
@@ -56,6 +57,7 @@ import com.binod.talktosomeone.presentation.ui.theme.Gray50
 import com.binod.talktosomeone.presentation.ui.theme.dimensions
 import com.binod.talktosomeone.utils.Constants
 import com.binod.talktosomeone.utils.copyTextToClipboard
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -78,6 +80,8 @@ fun HomeScreen(
     val currentUserId = viewModel.currentUserId ?: ""
     val nameCode = viewModel.nameCode
     val context = LocalContext.current
+    var copied by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSearchSheet by remember { mutableStateOf(false) }
@@ -154,9 +158,27 @@ fun HomeScreen(
                 },
                 navigationIcon = {
                     IconCircleButton(
-                        icon = { Icon(Icons.Outlined.ContentCopy, contentDescription = "Copy") },
+                        icon = {
+                            if (copied) {
+                                Icon(
+                                    imageVector = Icons.Default.Check, // ✅ tick icon
+                                    contentDescription = "Copied"
+                                )
+                            } else {
+                                Icon(
+                                    imageVector = Icons.Outlined.ContentCopy,
+                                    contentDescription = "Copy"
+                                )
+                            }
+                        },
                         onClick = {
                             copyTextToClipboard(context, currentUserId)
+                            copied = true
+
+                            scope.launch {
+                                delay(2000) // 2 seconds
+                                copied = false
+                            }
                         }
                     )
                 },
