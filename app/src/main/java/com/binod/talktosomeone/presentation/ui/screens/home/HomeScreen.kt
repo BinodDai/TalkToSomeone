@@ -2,6 +2,7 @@ package com.binod.talktosomeone.presentation.ui.screens.home
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -155,8 +156,25 @@ fun HomeScreen(
                         modifier = Modifier.wrapContentWidth(),
                         style = MaterialTheme.typography.titleLarge
                     )
+
                 },
-                navigationIcon = {
+
+                actions = {
+                    Text(
+                        text = stringResource(R.string.id),
+                        modifier = Modifier
+                            .wrapContentWidth()
+                            .clickable {
+                                copyTextToClipboard(context, currentUserId)
+                                copied = true
+                                scope.launch {
+                                    delay(2000) // 2 seconds
+                                    copied = false
+                                }
+                            },
+                        style = MaterialTheme.typography.titleLarge
+                    )
+
                     IconCircleButton(
                         icon = {
                             if (copied) {
@@ -181,8 +199,7 @@ fun HomeScreen(
                             }
                         }
                     )
-                },
-                actions = {
+                    Spacer(Modifier.padding(dimensions.paddingSmall))
                     IconCircleButton(
                         icon = { Icon(Icons.Outlined.Search, contentDescription = "Search") },
                         onClick = {
@@ -209,12 +226,16 @@ fun HomeScreen(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
                 .padding(innerPadding)
-                .padding(horizontal = dimensions.paddingMedium, vertical = dimensions.paddingMedium),
+                .padding(
+                    horizontal = dimensions.paddingMedium,
+                    vertical = dimensions.paddingMedium
+                ),
             verticalArrangement = Arrangement.spacedBy(dimensions.paddingLarge)
         ) {
             item { GreetingSection() }
             item { StatsSection(stats = stats) }
-            item { ConversationStartersSection(
+            item {
+                ConversationStartersSection(
                     starters = conversationStarters,
                     selectedType = selectedType,
                     onItemClick = { type ->
@@ -238,7 +259,8 @@ fun HomeScreen(
                             }
                         }
 
-                    }) }
+                    })
+            }
 
             if (recentChats.isNotEmpty()) {
                 item {
