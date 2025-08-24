@@ -7,14 +7,21 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,6 +39,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.binod.talktosomeone.domain.model.ChatMessage
+import com.binod.talktosomeone.domain.model.MessageStatus
 import com.binod.talktosomeone.domain.model.Profile
 import com.binod.talktosomeone.presentation.ui.theme.PrimaryLight
 import com.binod.talktosomeone.presentation.ui.theme.Shapes
@@ -46,8 +54,6 @@ fun MessageItem(
     currentUserId: String,
     partnerProfile: Profile? = null,
     repliedMessage: ChatMessage? = null,
-    onReactionClick: ((String) -> Unit)? = null,
-    onMessageLongPress: (() -> Unit)? = null,
     onReplySwipe: ((ChatMessage) -> Unit)? = null
 ) {
     val isFromMe = message.senderId == currentUserId
@@ -165,16 +171,39 @@ fun MessageItem(
                             }
                         }
 
-                        // Timestamp
-                        Text(
-                            text = formatTime(message.timestamp),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        // Timestamp + Status Ticks
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.End,
                             modifier = Modifier.padding(
                                 horizontal = dimensions.paddingExtraSmall,
                                 vertical = dimensions.paddingExtraExtraSmall
                             )
-                        )
+                        ) {
+                            Text(
+                                text = formatTime(message.timestamp),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+
+                            if (isFromMe) {
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Icon(
+                                    imageVector = when (message.status) {
+                                        MessageStatus.SENT -> Icons.Default.Check        // single tick
+                                        MessageStatus.DELIVERED -> Icons.Default.DoneAll // double tick
+                                        MessageStatus.SEEN -> Icons.Default.DoneAll      // double tick, blue
+                                    },
+                                    contentDescription = "Message status",
+                                    modifier = Modifier.size(16.dp),
+                                    tint = when (message.status) {
+                                        MessageStatus.SEEN -> Color.Blue
+                                        else -> Color.Gray
+                                    }
+                                )
+                            }
+                        }
+
                     }
 
                     if (message.reactions.isNotEmpty()) {

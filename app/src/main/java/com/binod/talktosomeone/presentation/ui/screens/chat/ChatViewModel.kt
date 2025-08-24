@@ -59,7 +59,7 @@ class ChatViewModel @Inject constructor(
             launch {
                 chatUseCase.observeMessages(chatId).collect { list ->
                     _messages.value = list
-                    chatUseCase.markDelivered(chatId, myId)
+//                    chatUseCase.markDelivered(chatId, myId)
 
                     if (isScreenActive) {
                         markSeen(myId, chatPartnerId)

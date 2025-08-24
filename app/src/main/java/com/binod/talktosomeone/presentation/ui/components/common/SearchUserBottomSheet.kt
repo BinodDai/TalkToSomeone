@@ -81,10 +81,20 @@ fun SearchUserBottomSheet(
             // UserId input field
             OutlinedTextField(
                 value = userId,
-                onValueChange = {
-                    if (it.length <= 50) userId = it
+                onValueChange = { newValue ->
+                    if (newValue.length <= 50) userId = newValue
                     profile = null
                     searchAttempted = false
+
+                    // Auto-search if it looks like a Firestore UID
+                    if (newValue.length in 28..36 && newValue.all { it.isLetterOrDigit() }) {
+                        scope.launch {
+                            isSearching = true
+                            profile = onSearch(newValue)
+                            searchAttempted = true
+                            isSearching = false
+                        }
+                    }
                 },
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text(stringResource(R.string.user_id)) },
@@ -113,6 +123,7 @@ fun SearchUserBottomSheet(
                     }
                 }
             )
+
 
             Spacer(Modifier.height(dimensions.spaceMedium))
 
@@ -155,7 +166,7 @@ fun SearchUserBottomSheet(
                 }
                 Button(
                     modifier = Modifier.weight(1f),
-                    enabled = profile != null,
+                    enabled = profile != null && profile?.userId != currentUserId,
                     onClick = {
                         profile?.let { it -> onContinue(it) }
                         onDismiss()

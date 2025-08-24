@@ -181,22 +181,18 @@ fun HomeScreen(
                 }
             )
         }
-    )
-
-
-    { innerPadding ->
+    ) { innerPadding ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
                 .padding(innerPadding)
-                .padding(horizontal = dimensions.paddingMedium),
+                .padding(horizontal = dimensions.paddingMedium, vertical = dimensions.paddingMedium),
             verticalArrangement = Arrangement.spacedBy(dimensions.paddingLarge)
         ) {
             item { GreetingSection() }
             item { StatsSection(stats = stats) }
-            item {
-                ConversationStartersSection(
+            item { ConversationStartersSection(
                     starters = conversationStarters,
                     selectedType = selectedType,
                     onItemClick = { type ->
@@ -220,8 +216,7 @@ fun HomeScreen(
                             }
                         }
 
-                    })
-            }
+                    }) }
 
             if (recentChats.isNotEmpty()) {
                 item {
@@ -235,6 +230,7 @@ fun HomeScreen(
             }
         }
     }
+
     if (snackbarState.isVisible) {
         CustomSnackbar(
             snackbarState = snackbarState,
